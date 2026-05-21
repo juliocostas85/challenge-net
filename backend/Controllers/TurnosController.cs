@@ -50,7 +50,20 @@ public class TurnosController : ControllerBase
             return NotFound(new { mensaje = "Paciente no encontrado." });
 
         if (paciente.Bloqueado)
-            return BadRequest(new { mensaje = "El paciente se encuentra bloqueado para agendar turnos online." });
+        {
+            // Si pasaron 30 días desde el bloqueo, se desbloquea automáticamente
+            if (paciente.FechaBloqueo.HasValue && (DateTime.UtcNow - paciente.FechaBloqueo.Value).TotalDays >= 30)
+            {
+                paciente.Bloqueado = false;
+                paciente.FechaBloqueo = null;
+                paciente.NoShowCount = 0;
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                return BadRequest(new { mensaje = "El paciente se encuentra bloqueado para agendar turnos online." });
+            }
+        }
 
         var medicoExiste = await _context.Medicos.AnyAsync(m => m.Id == turno.MedicoId);
         if (!medicoExiste)
