@@ -25,12 +25,12 @@
             <span :class="['badge', `badge-${turno.estado?.toLowerCase()}`]">{{ turno.estado }}</span>
           </td>
           <td>{{ turno.motivo }}</td>
-          <td>
-            <router-link :to="`/turnos/${turno.id}`">Ver</router-link>
+          <td style="white-space: nowrap">
+            <router-link :to="`/turnos/${turno.id}`" class="btn-ver">Ver</router-link>
             <button
               v-if="['Pendiente', 'Confirmado'].includes(turno.estado)"
               class="btn-danger"
-              style="margin-left: 8px"
+              style="margin-left: 6px"
               @click="cancelar(turno.id)"
             >Cancelar</button>
           </td>
@@ -88,4 +88,16 @@ export default {
 .badge-cancelado   { background: #f8d7da; color: #721c24; }
 .badge-atendido    { background: #d1ecf1; color: #0c5460; }
 .badge-noshow      { background: #e2e3e5; color: #383d41; }
+
+.btn-ver {
+  display: inline-block;
+  padding: 6px 14px;
+  background: #1a73e8;
+  color: #fff;
+  border-radius: 4px;
+  font-size: 13px;
+  text-decoration: none;
+  font-weight: 500;
+}
+.btn-ver:hover { background: #1558b0; }
 </style>
