@@ -61,6 +61,10 @@ export default {
   },
   methods: {
     async guardar() {
+      if (!this.form.pacienteId) return alert('Seleccioná un paciente')
+      if (!this.form.medicoId)   return alert('Seleccioná un médico')
+      if (!this.form.fechaHora)  return alert('Ingresá la fecha y hora del turno')
+
       try {
         await turnosApi.create({
           pacienteId: Number(this.form.pacienteId),
@@ -69,8 +73,8 @@ export default {
           motivo: this.form.motivo
         })
         this.$router.push('/turnos')
-      } catch {
-        alert('Error al procesar la solicitud')
+      } catch (e) {
+        alert(e.response?.data?.mensaje || 'Error al crear el turno')
       }
     }
   }

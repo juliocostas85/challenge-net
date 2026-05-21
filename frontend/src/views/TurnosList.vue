@@ -59,7 +59,13 @@ export default {
       return new Date(fecha).toLocaleString('es-AR')
     },
     async cancelar(id) {
-      await turnosApi.cancelar(id)
+      try {
+        await turnosApi.cancelar(id)
+        const res = await turnosApi.getAll()
+        this.turnos = res.data
+      } catch (e) {
+        alert(e.response?.data?.mensaje || 'Error al cancelar el turno')
+      }
     }
   }
 }
