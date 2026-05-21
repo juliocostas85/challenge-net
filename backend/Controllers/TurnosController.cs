@@ -41,6 +41,10 @@ public class TurnosController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CrearTurno([FromBody] Turno turno)
     {
+        //fix: validar explícitamente que PacienteId no sea null
+        if (turno.PacienteId == null)
+            return BadRequest(new { mensaje = "PacienteId es requerido." });
+
         var paciente = await _context.Pacientes.FindAsync(turno.PacienteId);
         if (paciente == null)
             return NotFound(new { mensaje = "Paciente no encontrado." });
@@ -66,13 +70,15 @@ public class TurnosController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = turno.Id }, turno);
     }
 
-    [HttpGet("cancelar/{id}")]
+    //fix: era [HttpGet], las acciones que modifican estado deben usar [HttpPut]
+    [HttpPut("cancelar/{id}")]
     public async Task<IActionResult> CancelarTurno(int id)
     {
         var turno = await _context.Turnos.FindAsync(id);
         if (turno == null) return NotFound();
 
-        if (turno.FechaHora - DateTime.Now < TimeSpan.FromHours(23))
+        // Bug 2 fix: el umbral era 23 horas pero el enunciado del challenge dice 24
+        if (turno.FechaHora - DateTime.UtcNow < TimeSpan.FromHours(24))
             return BadRequest(new { mensaje = "No se puede cancelar con menos de 24 horas de anticipación." });
 
         turno.Estado = EstadoTurno.Cancelado;
@@ -90,6 +96,22 @@ public class TurnosController : ControllerBase
             return BadRequest(new { mensaje = "La ausencia solo puede registrarse dentro de las 24 horas del turno." });
 
         turno.Estado = EstadoTurno.NoShow;
+
+        //fix: incrementar NoShowCount y bloquear al paciente si llega a 3
+        if (turno.PacienteId != null)
+        {
+            var paciente = await _context.Pacientes.FindAsync(turno.PacienteId);
+            if (paciente != null)
+            {
+                paciente.NoShowCount++;
+                if (paciente.NoShowCount >= 3)
+                {
+                    paciente.Bloqueado = true;
+                    paciente.FechaBloqueo = DateTime.UtcNow;
+                }
+            }
+        }
+
         await _context.SaveChangesAsync();
         return Ok(turno);
     }
