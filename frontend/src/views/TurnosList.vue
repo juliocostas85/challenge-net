@@ -27,7 +27,12 @@
           <td>{{ turno.motivo }}</td>
           <td>
             <router-link :to="`/turnos/${turno.id}`">Ver</router-link>
-            <button class="btn-danger" style="margin-left: 8px" @click="cancelar(turno.id)">Cancelar</button>
+            <button
+              v-if="['Pendiente', 'Confirmado'].includes(turno.estado)"
+              class="btn-danger"
+              style="margin-left: 8px"
+              @click="cancelar(turno.id)"
+            >Cancelar</button>
           </td>
         </tr>
       </tbody>

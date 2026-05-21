@@ -6,8 +6,8 @@
         <label>Paciente</label>
         <select v-model="form.pacienteId">
           <option value="">Seleccioná un paciente</option>
-          <option v-for="p in pacientes" :key="p.id" :value="p.id">
-            {{ p.nombreCompleto }} — DNI {{ p.dni }}
+          <option v-for="p in pacientes" :key="p.id" :value="p.id" :disabled="p.bloqueado">
+            {{ p.nombreCompleto }} — DNI {{ p.dni }}{{ p.bloqueado ? ' 🔒 (bloqueado)' : '' }}
           </option>
         </select>
       </div>
