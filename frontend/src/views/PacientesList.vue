@@ -11,6 +11,7 @@
           <th>Teléfono</th>
           <th>No-shows</th>
           <th>Bloqueado</th>
+          <th>Se desbloquea</th>
           <th>Acciones</th>
         </tr>
       </thead>
@@ -25,6 +26,10 @@
           <td>
             <span v-if="p.bloqueado" style="color: #d32f2f; font-weight: 600">Sí</span>
             <span v-else style="color: #388e3c">No</span>
+          </td>
+          <td>
+            <span v-if="p.bloqueado && p.fechaBloqueo">{{ fechaDesbloqueo(p.fechaBloqueo) }}</span>
+            <span v-else style="color: #aaa">—</span>
           </td>
           <td>
             <button class="btn-danger" @click="eliminar(p.id)">Eliminar</button>
@@ -55,6 +60,11 @@ export default {
     }
   },
   methods: {
+    fechaDesbloqueo(fechaBloqueo) {
+      const d = new Date(fechaBloqueo)
+      d.setDate(d.getDate() + 30)
+      return d.toLocaleDateString('es-AR')
+    },
     async eliminar(id) {
       if (!confirm('¿Estás seguro que querés eliminar este paciente?')) return
       try {
