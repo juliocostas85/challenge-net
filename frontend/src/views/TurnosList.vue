@@ -28,7 +28,7 @@
           <td style="white-space: nowrap">
             <router-link :to="`/turnos/${turno.id}`" class="btn-ver">Ver</router-link>
             <button
-              v-if="['Pendiente', 'Confirmado'].includes(turno.estado)"
+              v-if="['Pendiente', 'Confirmado'].includes(turno.estado) && new Date(turno.fechaHora) > new Date()"
               class="btn-danger"
               style="margin-left: 6px"
               @click="cancelar(turno.id)"

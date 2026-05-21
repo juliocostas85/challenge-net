@@ -90,7 +90,9 @@ public class TurnosController : ControllerBase
         var turno = await _context.Turnos.FindAsync(id);
         if (turno == null) return NotFound();
 
-        // Bug 2 fix: el umbral era 23 horas pero el enunciado del challenge dice 24
+        if (turno.FechaHora < DateTime.UtcNow)
+            return BadRequest(new { mensaje = "No se puede cancelar un turno que ya ha pasado." });
+
         if (turno.FechaHora - DateTime.UtcNow < TimeSpan.FromHours(24))
             return BadRequest(new { mensaje = "No se puede cancelar con menos de 24 horas de anticipación." });
 
